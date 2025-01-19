@@ -11,12 +11,18 @@ jobs:
       contents: write
     steps:
       - uses: nttld/setup-ndk@v1
+        id: setup-ndk
         with:
           ndk-version: r26d
       - uses: actions/checkout@v4
         with:
           repository: libunwind/libunwind
           ref: 'b3ca1b59a795a617877c01fe5d299ab7a07ff29d'
+      - name: check ndk path
+        run: |
+          ls -al $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/
+        env:
+          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
       
       - name: configure libunwind
         run: |
@@ -25,12 +31,13 @@ jobs:
           mkdir build
           cd build
           ../configure --build=aarch64-linux-gnu
-        # env:
-        #   CC: ${{ matrix.toolchain.CC }}
-        #   CXX: ${{ matrix.toolchain.CXX }}
-        #   CFLAGS: "${{ matrix.target.CFLAGS }} ${{ matrix.optimization.CFLAGS }} -g -Wall -Wextra"
-        #   CXXFLAGS: "${{ matrix.target.CFLAGS }} ${{ matrix.optimization.CFLAGS }} -g -Wall -Wextra"
-        #   LDFLAGS: ${{ matrix.target.CFLAGS }}
+        env:
+          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+          CC: $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/aarch64-linux-android21-clang
+          CXX: $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/aarch64-linux-android21-clang++
+          CFLAGS: "-I$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include -g -Wall -Wextra"
+          CXXFLAGS: "-I$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include -g -Wall -Wextra"
+          LDFLAGS: -L$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/sysroot
       - name: build libunwind
         run: |
           make -C build -j
