@@ -29,11 +29,12 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y g++-13-aarch64-linux-gnu abigail-tools
+          mkdir -p /home/runner/work/honggfuzz-build/honggfuzz-build/dist
           set -x
           autoreconf -i
           mkdir build
           cd build
-          ../configure --build=aarch64-linux-gnu --host=aarch64-linux-gnu --enable-debug
+          ../configure --build=aarch64-linux-gnu --host=aarch64-linux-gnu --enable-debug --prefix=/home/runner/work/honggfuzz-build/honggfuzz-build/dist
         env:
           CC: gcc-13
           CXX: g++-13
@@ -43,10 +44,11 @@ jobs:
       - name: build libunwind
         run: |
           make -C build -j
+          make install
       - name: upload
         uses: actions/upload-artifact@v4
         with:
-          path: /home/runner/work/honggfuzz-build/honggfuzz-build/build
+          path: /home/runner/work/honggfuzz-build/honggfuzz-build/dist
       # - uses: actions/setup-go@v5.2.0
       #   with:
       #     go-version: 1.22
