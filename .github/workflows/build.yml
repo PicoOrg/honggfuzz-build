@@ -67,11 +67,6 @@ jobs:
           ref: '02f8a7f572e8a98aaffcb5b3d5c73a2835770dcf'
       - uses: actions/download-artifact@v4
         with:
-          name: libunwind
-          path: /home/runner/work/honggfuzz-build/honggfuzz-build/
-      - uses: actions/download-artifact@v4
-        with:
-          name: capstone
           path: /home/runner/work/honggfuzz-build/honggfuzz-build/
       - name: setup
         run: |
