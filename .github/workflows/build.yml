@@ -1,0 +1,51 @@
+name: AndroidBox Main
+run-name: AndroidBox build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r26d
+      - uses: actions/checkout@v4
+        with:
+          repository: libunwind/libunwind
+      - name: Checkout libunwind
+        run: git checkout b3ca1b59a795a617877c01fe5d299ab7a07ff29d
+      
+      - name: configure libunwind
+        run: |
+          set -x
+          autoreconf -i
+          mkdir build
+          cd build
+          ../configure --build=aarch64-linux-gnu
+        # env:
+        #   CC: ${{ matrix.toolchain.CC }}
+        #   CXX: ${{ matrix.toolchain.CXX }}
+        #   CFLAGS: "${{ matrix.target.CFLAGS }} ${{ matrix.optimization.CFLAGS }} -g -Wall -Wextra"
+        #   CXXFLAGS: "${{ matrix.target.CFLAGS }} ${{ matrix.optimization.CFLAGS }} -g -Wall -Wextra"
+        #   LDFLAGS: ${{ matrix.target.CFLAGS }}
+      - name: build libunwind
+        run: |
+          make -C build -j
+      # - uses: actions/setup-go@v5.2.0
+      #   with:
+      #     go-version: 1.22
+      # - name: Build the build tool
+      #   run: 'pwd && go mod tidy && cd cmd/build && go build .'
+      # - name: check build config
+      #   run: 'pwd && cat .github/config/main.config.yaml'
+      # - name: Build AndroidBox
+      #   run: 'pwd && cmd/build/build -f .github/config/main.config.yaml -t ${{ github.ref_name }}'
+      # - name: Create Release
+      #   uses: ncipollo/release-action@v1.15.0
+      #   with:
+      #     artifacts: cmd/AndroidBox/AndroidBox_*,cmd/build/build
+  
