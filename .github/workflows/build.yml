@@ -16,8 +16,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: libunwind/libunwind
-      - name: Checkout libunwind
-        run: git checkout v1.6.2
+          ref: ''
       
       - name: configure libunwind
         run: |
