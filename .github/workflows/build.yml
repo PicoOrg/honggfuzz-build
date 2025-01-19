@@ -5,21 +5,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-libunwind:
     runs-on: ubuntu-24.04-arm
-    permissions:
-      contents: write
     steps:
-      # - uses: nttld/setup-ndk@v1
-      #   id: setup-ndk
-      #   with:
-      #     ndk-version: r26d
-      # - name: check ndk path
-      #   run: |
-      #     ls -al $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/
-      #   env:
-      #     ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
-      
       - uses: actions/checkout@v4
         with:
           repository: libunwind/libunwind
@@ -34,7 +22,7 @@ jobs:
           autoreconf -i
           mkdir build
           cd build
-          ../configure --build=aarch64-linux-gnu --host=aarch64-linux-gnu --enable-debug --prefix=/home/runner/work/honggfuzz-build/honggfuzz-build/dist
+          ../configure --build=aarch64-linux-gnu --host=aarch64-linux-gnu --prefix=/home/runner/work/honggfuzz-build/honggfuzz-build/dist
         env:
           CC: gcc-13
           CXX: g++-13
@@ -48,6 +36,25 @@ jobs:
       - name: upload
         uses: actions/upload-artifact@v4
         with:
+          name: libunwind
+          path: /home/runner/work/honggfuzz-build/honggfuzz-build/dist
+  build-capstone:
+      - uses: actions/checkout@v4
+        with:
+          repository: capstone-engine/capstone
+          ref: 'e710e4fcf40302c25d7bdc28da93571a61f21f5d'
+      - name: build
+        run: |
+          sudo apt update
+          sudo apt install -y g++-13-aarch64-linux-gnu abigail-tools cmake
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          mkdir -p /home/runner/work/honggfuzz-build/honggfuzz-build/dist
+          cmake --build build
+          cmake --install build --prefix /home/runner/work/honggfuzz-build/honggfuzz-build/dist
+      - name: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: capstone
           path: /home/runner/work/honggfuzz-build/honggfuzz-build/dist
       # - uses: actions/setup-go@v5.2.0
       #   with:
