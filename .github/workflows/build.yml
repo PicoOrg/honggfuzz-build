@@ -1,5 +1,5 @@
-name: AndroidBox Main
-run-name: AndroidBox build
+name: honggfuzz
+run-name: honggfuzz
 
 on:
   workflow_dispatch:
@@ -17,7 +17,7 @@ jobs:
         with:
           repository: libunwind/libunwind
       - name: Checkout libunwind
-        run: git checkout b3ca1b59a795a617877c01fe5d299ab7a07ff29d
+        run: git checkout v1.6.2
       
       - name: configure libunwind
         run: |
