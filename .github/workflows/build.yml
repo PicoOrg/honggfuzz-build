@@ -60,6 +60,7 @@ jobs:
           path: /home/runner/work/honggfuzz-build/honggfuzz-build/dist
   build-honggfuzz:
     runs-on: ubuntu-24.04
+    needs: [build-libunwind, build-capstone]
     steps:
       - uses: actions/checkout@v4
         with:
