@@ -10,15 +10,15 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: nttld/setup-ndk@v1
-        id: setup-ndk
-        with:
-          ndk-version: r26d
-      - name: check ndk path
-        run: |
-          ls -al $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/
-        env:
-          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+      # - uses: nttld/setup-ndk@v1
+      #   id: setup-ndk
+      #   with:
+      #     ndk-version: r26d
+      # - name: check ndk path
+      #   run: |
+      #     ls -al $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/
+      #   env:
+      #     ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
       
       - uses: actions/checkout@v4
         with:
