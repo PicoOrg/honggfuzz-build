@@ -20,7 +20,10 @@ jobs:
           ref: 'b3ca1b59a795a617877c01fe5d299ab7a07ff29d'
       - name: check ndk path
         run: |
-          ls -al $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/
+          ls -al $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/sysroot
+          ls -al $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include
+          $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang
+          $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang++
         env:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
       
