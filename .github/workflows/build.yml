@@ -6,92 +6,32 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-24.04-arm
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
-        with:
-          repository: libunwind/libunwind
-          ref: 'b3ca1b59a795a617877c01fe5d299ab7a07ff29d'
-
-      - name: Install QEMU
-        # this ensure install latest qemu on ubuntu, apt get version is old
-        env:
-          QEMU_SRC: "http://archive.ubuntu.com/ubuntu/pool/universe/q/qemu"
-          QEMU_VER: "qemu-user-static_7\\.2.*_amd64.deb$"
-        run: |
-          DEB=`curl -s $QEMU_SRC/ | grep -o -E 'href="([^"#]+)"' | cut -d'"' -f2 | grep $QEMU_VER | tail -1`
-          wget $QEMU_SRC/$DEB
-          sudo dpkg -i $DEB
-
-      - name: Install aarch64-linux-gnu Toolchain
-        run: |
-          sudo apt update
-          sudo apt install -y g++-12-aarch64-linux-gnu abigail-tools
-
-      - name: Configure
-        run: |
-          set -x
-          autoreconf -i
-          mkdir build
-          cd build
-          ../configure --build=$(config/config.guess) \
-                       --host=aarch64-linux-gnu \
-                       --with-testdriver="$(pwd)/libtool execute $(pwd)/../scripts/qemu-test-driver" \
-                       --enable-debug
-        env:
-          CC: aarch64-linux-gnu-gcc-12
-          CXX: aarch64-linux-gnu-g++-12
-
-      - name: Build
-        run: |
-          make -C build -j
-        env:
-          CFLAGS: "-Wall -Wextra -g -Og"
-
-      - name: ABI Check
-        run: |
-          make -C build/src abi-check
-
-      - name: Test
-        run: |
-          set -x
-          sudo bash -c 'echo core.%p.%p > /proc/sys/kernel/core_pattern'
-          ulimit -c unlimited
-          cd build
-          make check LOG_DRIVER_FLAGS="--qemu-arch aarch64" \
-                     QEMU_LD_PREFIX="$CROSS_LIB" \
-                     LDFLAGS="-L$CROSS_LIB/lib"
-        env:
-          UNW_DEBUG_LEVEL: 4
-          CROSS_LIB: "/usr/aarch64-linux-gnu"
-
-      - name: Show Logs
-        if: ${{ failure() }}
-        run: |
-          cat build/tests/test-suite.log 2>/dev/null
-          
       - uses: nttld/setup-ndk@v1
         id: setup-ndk
         with:
           ndk-version: r26d
       - name: check ndk path
         run: |
-          ls -al $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/sysroot
-          ls -al $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include
-          ls -al $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang
-          ls -al $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang++
+          ls -al $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/
         env:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
       
+      - uses: actions/checkout@v4
+        with:
+          repository: libunwind/libunwind
+          ref: 'b3ca1b59a795a617877c01fe5d299ab7a07ff29d'
+
       - name: configure libunwind
         run: |
           set -x
           autoreconf -i
           mkdir build
           cd build
-          ../configure --build=aarch64-linux-gnu --host=x86_64-pc-linux-gnu --enable-debug
+          ../configure --build=aarch64-linux-gnu --host=aarch64-linux-gn --enable-debug
         env:
           CC: clang-13
           CXX: clang++-13
