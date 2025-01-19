@@ -31,7 +31,7 @@ jobs:
           autoreconf -i
           mkdir build
           cd build
-          ../configure --build=aarch64-linux-gnu --host=aarch64-linux-gn --enable-debug
+          ../configure --build=aarch64-linux-gnu --host=aarch64-linux-gnu --enable-debug
         env:
           CC: clang-13
           CXX: clang++-13
